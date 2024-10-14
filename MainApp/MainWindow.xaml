@@ -21,6 +21,8 @@
             <TextBox x:Name="Input_ProductName" Margin="0,0,0,10" Padding="5"/>
             <TextBlock Text="Product Price"/>
             <TextBox x:Name="Input_ProductPrice" Margin="0,0,0,10" Padding="5"/>
+            <TextBlock Text="Product Category"/>
+            <TextBox x:Name="Input_ProductCategory" Margin="0,0,0,10" Padding="5"/>
             <Button x:Name="BtnSave" Click="BtnSave_Click" Content="Save" Padding="5"/>
         </StackPanel>
 
@@ -37,7 +39,7 @@
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
                         </Button>
                         <Button Click="BtnUpdate_Click" Margin="5,0,0,0">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72D;" />
                         </Button>
                     </StackPanel>
                 </DataTemplate>

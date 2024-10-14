@@ -1,10 +1,55 @@
-﻿using Shared.Models;
+﻿using Newtonsoft.Json;
+using Shared.Models;
 
 namespace Shared.Services;
 
 public class ProductService
 {
     private List<Product> _products = [];
+
+    private static readonly string _filePath = Path.Combine(AppContext.BaseDirectory, "file.json");
+    private readonly FileService _fileService;
+
+    public ProductService(FileService fileService)
+    {
+        _fileService = fileService;
+        LoadProductsFromFile(); 
+    }
+
+    public ServiceResponse LoadProductsFromFile()
+    {
+        try
+        {
+            var response = _fileService.GetFromFile();
+            if (response.Succeeded && response.Result is string content)
+            {
+                _products = JsonConvert.DeserializeObject<List<Product>>(content) ?? new List<Product>();
+                return new ServiceResponse
+                {
+                    Succeeded = true,
+                    Message = "Products loaded successfully."
+                };
+            }
+            else
+            {
+                _products = new List<Product>(); 
+                return new ServiceResponse
+                {
+                    Succeeded = false,
+                    Message = response.Message
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            _products = [];
+            return new ServiceResponse
+            {
+                Succeeded = false,
+                Message = ex.Message
+            };
+        }
+    }
 
 
     public ServiceResponse AddProduct(Product product)
@@ -20,6 +65,8 @@ public class ProductService
                 };
             }
             _products.Add(product);
+            var json = JsonConvert.SerializeObject(_products, Newtonsoft.Json.Formatting.Indented);
+            var result = _fileService.SaveToFile(json);
 
             return new ServiceResponse
             {
@@ -40,6 +87,7 @@ public class ProductService
 
     public IEnumerable<Product> GetProducts()
     {
+
         return _products;
     }
 
@@ -47,6 +95,7 @@ public class ProductService
     {
         try
         {
+
             var product = _products.FirstOrDefault(p => p.Id == id);
             if (product == null)
             {
@@ -78,6 +127,7 @@ public class ProductService
     {
         try
         {
+
             if (string.IsNullOrEmpty(newName) || string.IsNullOrEmpty(newPrice))
             {
                 return new ServiceResponse
@@ -98,6 +148,9 @@ public class ProductService
 
             product.ProductName = newName;
             product.ProductPrice = newPrice;
+
+            var json = JsonConvert.SerializeObject(_products, Newtonsoft.Json.Formatting.Indented);
+            var result = _fileService.SaveToFile(json);
 
             return new ServiceResponse
             {

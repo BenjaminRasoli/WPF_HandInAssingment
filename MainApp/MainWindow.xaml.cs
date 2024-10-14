@@ -1,4 +1,5 @@
-﻿using Shared.Models;
+﻿using Shared.Interfaces;
+using Shared.Models;
 using Shared.Services;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -29,7 +30,11 @@ namespace MainApp
         public MainWindow()
         {
             InitializeComponent();
-            _productService = new ProductService();
+            var filePath = "file.json";
+            var fileService = new FileService(filePath);
+            _productService = new ProductService(fileService);
+            UpdateListBox();
+
         }
 
 
@@ -51,7 +56,7 @@ namespace MainApp
                 var newProduct = new Product
                 {
                     ProductName = productName,
-                    ProductPrice = productPrice
+                    ProductPrice = productPrice,
                 };
 
                 var response = _productService.AddProduct(newProduct);
