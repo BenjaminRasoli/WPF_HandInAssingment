@@ -47,6 +47,36 @@ public class ProductService_Tests : IDisposable
     }
 
     [Fact]
+
+    public void AddProduct_ToList__WithSameName_ShouldReturnFalse()
+    {
+        var product1 = new Product
+        {
+            Id = "1",
+            ProductName = "Test Product",
+            ProductPrice = "100",
+            Category = new Category { CategoryName = "Test Category" }
+        };
+        var product2 = new Product
+        {
+            Id = "2",
+            ProductName = "Test Product",
+            ProductPrice = "100",
+            Category = new Category { CategoryName = "Test Category" }
+        };
+
+        var result1 = _productService.AddProduct(product1);
+        var result2 = _productService.AddProduct(product2);
+
+        Assert.True(result1.Succeeded);
+        Assert.Single(_productService.GetProducts());
+
+        Assert.False(result2.Succeeded);
+        Assert.Single(_productService.GetProducts());
+    }
+
+
+    [Fact]
     public void RemoveProduct__FromList__ShouldReturnTrue()
     {
         var product = new Product
