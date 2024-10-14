@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
+using Shared.Interfaces;
 using Shared.Models;
 
 namespace Shared.Services;
 
-public class ProductService
+public class ProductService : IProductService
 {
     private List<Product> _products = [];
 
@@ -13,7 +14,7 @@ public class ProductService
     public ProductService(FileService fileService)
     {
         _fileService = fileService;
-        LoadProductsFromFile(); 
+        LoadProductsFromFile();
     }
 
     public ServiceResponse LoadProductsFromFile()
@@ -32,7 +33,7 @@ public class ProductService
             }
             else
             {
-                _products = new List<Product>(); 
+                _products = new List<Product>();
                 return new ServiceResponse
                 {
                     Succeeded = false,
@@ -54,16 +55,26 @@ public class ProductService
 
     public ServiceResponse AddProduct(Product product)
     {
-		try
-		{
-			if(string.IsNullOrEmpty(product.ProductName) || string.IsNullOrEmpty(product.ProductPrice))
-			{
+        try
+        {
+            if (string.IsNullOrEmpty(product.ProductName) || string.IsNullOrEmpty(product.ProductPrice) || string.IsNullOrEmpty(product.Category.CategoryName))
+            {
                 return new ServiceResponse
                 {
                     Succeeded = false,
-                    Message = "Please enter a product name and price"
+                    Message = "Please enter a product  name,price and category"
                 };
             }
+
+            if (_products.Any(p => p.ProductName.Equals(product.ProductName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return new ServiceResponse
+                {
+                    Succeeded = false,
+                    Message = "Product with that name already exists"
+                };
+            }
+
             _products.Add(product);
             var json = JsonConvert.SerializeObject(_products, Newtonsoft.Json.Formatting.Indented);
             var result = _fileService.SaveToFile(json);
@@ -75,8 +86,8 @@ public class ProductService
                 Result = product
             };
         }
-		catch (Exception ex)
-		{
+        catch (Exception ex)
+        {
             return new ServiceResponse
             {
                 Succeeded = false,
@@ -106,6 +117,8 @@ public class ProductService
                 };
             }
             _products.Remove(product);
+            var json = JsonConvert.SerializeObject(_products, Newtonsoft.Json.Formatting.Indented);
+            _fileService.SaveToFile(json);
 
             return new ServiceResponse
             {
@@ -123,17 +136,17 @@ public class ProductService
         }
     }
 
-    public ServiceResponse UpdateProduct(string id, string newName, string newPrice)
+    public ServiceResponse UpdateProduct(string id, string newName, string newPrice, string newCategory)
     {
         try
         {
 
-            if (string.IsNullOrEmpty(newName) || string.IsNullOrEmpty(newPrice))
+            if (string.IsNullOrEmpty(newName) || string.IsNullOrEmpty(newPrice) || string.IsNullOrEmpty(newCategory))
             {
                 return new ServiceResponse
                 {
                     Succeeded = false,
-                    Message = "Please enter a product name and price"
+                    Message = "Please enter a product name,price and category"
                 };
             }
             var product = _products.FirstOrDefault(p => p.Id == id);
@@ -148,6 +161,7 @@ public class ProductService
 
             product.ProductName = newName;
             product.ProductPrice = newPrice;
+            product.Category.CategoryName = newCategory;
 
             var json = JsonConvert.SerializeObject(_products, Newtonsoft.Json.Formatting.Indented);
             var result = _fileService.SaveToFile(json);

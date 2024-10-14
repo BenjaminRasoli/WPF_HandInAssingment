@@ -1,17 +1,9 @@
-﻿using Shared.Interfaces;
-using Shared.Models;
+﻿using Shared.Models;
 using Shared.Services;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+
 
 namespace MainApp
 {
@@ -42,10 +34,13 @@ namespace MainApp
         {
             var productName = Input_ProductName.Text;
             var productPrice = Input_ProductPrice.Text;
+            var productCategory = Input_ProductCategory.Text;
+
+            var category = new Category { CategoryName = productCategory }; 
 
             if (_editingProduct != null)
             {
-                var response = _productService.UpdateProduct(_editingProduct.Id, productName, productPrice);
+                var response = _productService.UpdateProduct(_editingProduct.Id, productName, productPrice, productCategory);
 
                 MessageBox.Show(response.Message);
 
@@ -57,6 +52,7 @@ namespace MainApp
                 {
                     ProductName = productName,
                     ProductPrice = productPrice,
+                    Category = category
                 };
 
                 var response = _productService.AddProduct(newProduct);
@@ -66,6 +62,7 @@ namespace MainApp
 
             Input_ProductName.Text = "";
             Input_ProductPrice.Text = "";
+            Input_ProductCategory.Text = "";
 
             UpdateListBox();
         }
@@ -105,6 +102,7 @@ namespace MainApp
             {
                 Input_ProductName.Text = product.ProductName;
                 Input_ProductPrice.Text = product.ProductPrice;
+                Input_ProductCategory.Text = product.Category.CategoryName;
 
                 _editingProduct = product;
             }
