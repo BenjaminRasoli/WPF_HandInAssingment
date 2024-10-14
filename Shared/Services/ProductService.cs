@@ -19,16 +19,6 @@ public class ProductService
                     Message = "Please enter a product name and price"
                 };
             }
-
-            if(_products.FirstOrDefault(p => product.ProductName == p.ProductName) == null)
-            {
-                return new ServiceResponse
-                {
-                    Succeeded = false,
-                    Message = "Product with that name already exists"
-                };
-            }
-
             _products.Add(product);
 
             return new ServiceResponse
@@ -46,5 +36,10 @@ public class ProductService
                 Message = ex.Message,
             };
         }
+    }
+
+    public IEnumerable<Product> GetProducts()
+    {
+        return _products;
     }
 }

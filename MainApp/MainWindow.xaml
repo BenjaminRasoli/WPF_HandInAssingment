@@ -5,8 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MainApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow"
+        Height="450"
+        Width="300"
+        WindowStartupLocation="CenterScreen"
+        >
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="Product Name"/>
+            <TextBox x:Name="Input_ProductName" Margin="0,0,0,10" Padding="5"/>
+            <TextBlock Text="Product Price"/>
+            <TextBox x:Name="Input_ProductPrice" Margin="0,0,0,10" Padding="5"/>
+            <Button x:Name="BtnSave" Click="BtnSave_Click" Content="Save" Padding="5"/>
+        </StackPanel>
+
+        <ListBox x:Name="LB_Products" Grid.Row="1" Margin="0,10,0,0" >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                        <StackPanel Orientation="Vertical" Width="100">
+                            <TextBlock Text="{Binding ProductName}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding ProductPrice}"/>
+                            <TextBlock Text="{Binding Id}" FontStyle="Italic" Foreground="Gray"/>
+                        </StackPanel>
+                        <Button Click="BtnRemove_Click" Margin="5,0,0,0">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
+                        </Button>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
     </Grid>
 </Window>
