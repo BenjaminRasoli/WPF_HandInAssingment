@@ -42,10 +42,10 @@ namespace MainApp
 
             MessageBox.Show(response.Message);
 
-            UpdateListView();
+            UpdateListBox();
         }
 
-        private void UpdateListView()
+        private void UpdateListBox()
         {
             _products.Clear();
             foreach (var product in _productService.GetProducts())
@@ -58,7 +58,15 @@ namespace MainApp
 
         private void BtnRemove_Click(object sender, RoutedEventArgs e)
         {
+            var button = sender as Button;
+            var product = button!.DataContext as Product;
 
+            if (product != null)
+            {
+                _productService.RemoveProduct(product.Id);
+
+                UpdateListBox();
+            }
         }
 
 

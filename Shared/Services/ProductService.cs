@@ -42,4 +42,35 @@ public class ProductService
     {
         return _products;
     }
+
+    public ServiceResponse RemoveProduct(string id)
+    {
+        try
+        {
+            var product = _products.FirstOrDefault(p => p.Id == id);
+            if (product == null)
+            {
+                return new ServiceResponse
+                {
+                    Succeeded = false,
+                    Message = "No product with that id"
+                };
+            }
+            _products.Remove(product);
+
+            return new ServiceResponse
+            {
+                Succeeded = true,
+                Message = "Product was deleted suecesfully"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse
+            {
+                Succeeded = false,
+                Message = ex.Message
+            };
+        }
+    }
 }
