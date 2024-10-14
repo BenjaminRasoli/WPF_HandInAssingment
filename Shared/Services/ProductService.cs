@@ -73,4 +73,45 @@ public class ProductService
             };
         }
     }
+
+    public ServiceResponse UpdateProduct(string id, string newName, string newPrice)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(newName) || string.IsNullOrEmpty(newPrice))
+            {
+                return new ServiceResponse
+                {
+                    Succeeded = false,
+                    Message = "Please enter a product name and price"
+                };
+            }
+            var product = _products.FirstOrDefault(p => p.Id == id);
+            if (product == null)
+            {
+                return new ServiceResponse
+                {
+                    Succeeded = false,
+                    Message = "No product with that id"
+                };
+            }
+
+            product.ProductName = newName;
+            product.ProductPrice = newPrice;
+
+            return new ServiceResponse
+            {
+                Succeeded = true,
+                Message = "Product updated successfully"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ServiceResponse
+            {
+                Succeeded = false,
+                Message = ex.Message
+            };
+        }
+    }
 }

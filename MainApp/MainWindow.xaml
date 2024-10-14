@@ -36,6 +36,9 @@
                         <Button Click="BtnRemove_Click" Margin="5,0,0,0">
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
                         </Button>
+                        <Button Click="BtnUpdate_Click" Margin="5,0,0,0">
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
+                        </Button>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

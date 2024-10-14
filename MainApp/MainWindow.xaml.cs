@@ -21,26 +21,46 @@ namespace MainApp
     {
         private readonly ProductService _productService;
         private ObservableCollection<Product> _products = [];
+        private Product _editingProduct = null!; 
+
+
+
 
         public MainWindow()
         {
             InitializeComponent();
             _productService = new ProductService();
         }
+
+
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            var product = new Product
+            var productName = Input_ProductName.Text;
+            var productPrice = Input_ProductPrice.Text;
+
+            if (_editingProduct != null)
             {
-                ProductName = Input_ProductName.Text,
-                ProductPrice = Input_ProductPrice.Text
-            };
-            var response = _productService.AddProduct(product);
+                var response = _productService.UpdateProduct(_editingProduct.Id, productName, productPrice);
+
+                MessageBox.Show(response.Message);
+
+                _editingProduct = null!;
+            }
+            else
+            {
+                var newProduct = new Product
+                {
+                    ProductName = productName,
+                    ProductPrice = productPrice
+                };
+
+                var response = _productService.AddProduct(newProduct);
+
+                MessageBox.Show(response.Message);
+            }
 
             Input_ProductName.Text = "";
             Input_ProductPrice.Text = "";
-
-
-            MessageBox.Show(response.Message);
 
             UpdateListBox();
         }
@@ -66,8 +86,28 @@ namespace MainApp
                 _productService.RemoveProduct(product.Id);
 
                 UpdateListBox();
-            }
+            }   
         }
+
+
+
+        private void BtnUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var product = button?.DataContext as Product;
+
+            if (product != null)
+            {
+                Input_ProductName.Text = product.ProductName;
+                Input_ProductPrice.Text = product.ProductPrice;
+
+                _editingProduct = product;
+            }
+ 
+        }
+
+
+
 
 
     }
