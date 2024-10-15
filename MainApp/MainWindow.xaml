@@ -39,7 +39,7 @@
                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74D;" />
                         </Button>
                         <Button Click="BtnUpdate_Click" Margin="5,0,0,0">
-                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE72D;" />
+                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE70F;" />
                         </Button>
                     </StackPanel>
                 </DataTemplate>
