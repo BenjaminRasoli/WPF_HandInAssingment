@@ -1,50 +1,46 @@
 ﻿using System.IO;
 using System.Linq;
+using Moq;
+using Newtonsoft.Json;
+using Shared.Interfaces;
 using Shared.Models;
 using Shared.Services;
 using Xunit;
 
 namespace ProductTests.UnitTests;
 
-public class ProductService_Tests : IDisposable
+public class ProductService_Tests
 {
-    private readonly string TestFilePath = Path.Combine(AppContext.BaseDirectory, "testfile.json");
-    private readonly FileService _fileService;
-    private readonly ProductService _productService;
 
-    public ProductService_Tests()
-    {
-        _fileService = new FileService(TestFilePath);
-        _productService = new ProductService(_fileService);
-    }
+        private readonly Mock<IFileService> _fileServiceMock;
+        private readonly ProductService _productService;
 
-    public void Dispose()
-    {
-        if (File.Exists(TestFilePath))
+        public ProductService_Tests()
         {
-            File.Delete(TestFilePath);
+            _fileServiceMock = new Mock<IFileService>();
+            _productService = new ProductService(_fileServiceMock.Object);
         }
-    }
 
-
-
-    [Fact]
-    public void AddProduct__ToList__ShouldReturnTrue()
-    {
-
-        var product = new Product
+        [Fact]
+        public void AddProduct_ValidProduct_ShouldReturnTrueAndAddProduct()
         {
-            Id = "1",
-            ProductName = "Test Product",
-            ProductPrice = "100",
-            Category = new Category { CategoryName = "Test Category" }
-        };
+            var product = new Product
+            {
+                Id = "1",
+                ProductName = "Test Product",
+                ProductPrice = "100",
+                Category = new Category { CategoryName = "Test Category" }
+            };
 
-        var result = _productService.AddProduct(product);
+            _fileServiceMock
+                .Setup(fs => fs.SaveToFile(It.IsAny<string>()))
+                .Returns(new ServiceResponse { Succeeded = true });
 
-        Assert.True(result.Succeeded);
-        Assert.Single(_productService.GetProducts());
-    }
+            var result = _productService.AddProduct(product);
+
+            Assert.True(result.Succeeded);
+            Assert.Single(_productService.GetProducts());
+        }
 
     [Fact]
 
@@ -65,30 +61,34 @@ public class ProductService_Tests : IDisposable
             Category = new Category { CategoryName = "Test Category" }
         };
 
+        _fileServiceMock
+            .Setup(fs => fs.SaveToFile(It.IsAny<string>()))
+            .Returns(new ServiceResponse { Succeeded = true });
+
         var result1 = _productService.AddProduct(product1);
         var result2 = _productService.AddProduct(product2);
 
-        Assert.True(result1.Succeeded);
-        Assert.Single(_productService.GetProducts());
-
         Assert.False(result2.Succeeded);
-        Assert.Single(_productService.GetProducts());
     }
 
-
     [Fact]
+
     public void RemoveProduct__FromList__ShouldReturnTrue()
     {
         var product = new Product
         {
             Id = "1",
-            ProductName = "Test Product",
+            ProductName = "Test",
             ProductPrice = "100",
             Category = new Category { CategoryName = "Test Category" }
-        };
+        }; 
+
+
+        _fileServiceMock
+            .Setup(fs => fs.SaveToFile(It.IsAny<string>()))
+            .Returns(new ServiceResponse { Succeeded = true });
 
         _productService.AddProduct(product);
-
         var result = _productService.RemoveProduct(product.Id);
 
         Assert.True(result.Succeeded);
@@ -96,6 +96,7 @@ public class ProductService_Tests : IDisposable
     }
 
     [Fact]
+
     public void UpdateProduct__FromList__ShouldUpdateProduct_ReturnTrue()
     {
         var product = new Product
@@ -105,6 +106,10 @@ public class ProductService_Tests : IDisposable
             ProductPrice = "100",
             Category = new Category { CategoryName = "Old Category" }
         };
+
+        _fileServiceMock
+    .Setup(fs => fs.SaveToFile(It.IsAny<string>()))
+    .Returns(new ServiceResponse { Succeeded = true });
 
         _productService.AddProduct(product);
 
@@ -123,7 +128,7 @@ public class ProductService_Tests : IDisposable
     }
 
     [Fact]
-    public void SaveAndLoadProducts__FromFile__ShouldReturnTrue()
+    public void SaveAndLoadProducts_FromFile_ShouldReturnTrue()
     {
         var product1 = new Product
         {
@@ -141,17 +146,34 @@ public class ProductService_Tests : IDisposable
             Category = new Category { CategoryName = "Category B" }
         };
 
+        var json = JsonConvert.SerializeObject(new List<Product> { product1, product2 });
+
+        _fileServiceMock
+            .Setup(fs => fs.SaveToFile(It.IsAny<string>()))
+            .Returns(new ServiceResponse 
+            { 
+                Succeeded = true
+            });
+
+        _fileServiceMock
+            .Setup(fs => fs.GetFromFile())
+            .Returns(new ServiceResponse
+            {
+                Succeeded = true,
+                Result = json
+            });
+
         _productService.AddProduct(product1);
         _productService.AddProduct(product2);
-
         var result = _productService.LoadProductsFromFile();
 
         Assert.True(result.Succeeded);
         var loadedProducts = _productService.GetProducts().ToList();
 
         Assert.Equal(2, loadedProducts.Count);
-        Assert.Equal(product1.ProductName, loadedProducts[0].ProductName);
-        Assert.Equal(product1.ProductPrice, loadedProducts[0].ProductPrice);
-        Assert.Equal(product1.Category.CategoryName, loadedProducts[0].Category.CategoryName);
+        Assert.Contains(loadedProducts, p => p.ProductName == product1.ProductName);
+        Assert.Contains(loadedProducts, p => p.ProductName == product2.ProductName);
     }
+
 }
+

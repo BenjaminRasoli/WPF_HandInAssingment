@@ -9,9 +9,8 @@ public class ProductService : IProductService
     private List<Product> _products = [];
 
     private static readonly string _filePath = Path.Combine(AppContext.BaseDirectory, "file.json");
-    private readonly FileService _fileService;
-
-    public ProductService(FileService fileService)
+    private readonly IFileService _fileService;
+    public ProductService(IFileService fileService)
     {
         _fileService = fileService;
         LoadProductsFromFile();
@@ -96,9 +95,8 @@ public class ProductService : IProductService
         }
     }
 
-    public IEnumerable<Product> GetProducts()
+    public IEnumerable <Product> GetProducts()
     {
-
         return _products;
     }
 
